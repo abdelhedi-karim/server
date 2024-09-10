@@ -15,14 +15,22 @@ app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
-
 // PostgreSQL connection setup
 const pool = new Pool({
-    user: 'postgres', // Corrected username
-    host: 'localhost',
+    user: 'bet_owner',
+    host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
     database: 'bet',
-    password: '21911157Aa.', // Ensure this is correct
+    password: '4IR9VtcSeCiw', // Make sure this is a string
     port: 5432,
+    ssl: {
+        rejectUnauthorized: false, // Only for local testing with self-signed certificate
+    }
+});
+
+// Handle connection errors
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+    process.exit(-1);
 });
 
   
