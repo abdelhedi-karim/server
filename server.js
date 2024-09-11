@@ -16,6 +16,7 @@ app.use(cors());
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 // PostgreSQL connection setup
+// API endpoint to create a new user// API endpoint to create a new user// API endpoint to create a new user
 const pool = new Pool({
     user: 'bet_owner',
     host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
@@ -57,7 +58,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 
-
+// API endpoint to create a new user// API endpoint to create a new user// API endpoint to create a new user
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
     const { login, password, num } = req.body;
