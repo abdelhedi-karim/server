@@ -16,7 +16,7 @@ app.use(cors());
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 // PostgreSQL connection setup
-// API endpoint to create a new user// API endpoint to create a new user// API endpoint to create a new user
+
 const pool = new Pool({
     user: 'bet_owner',
     host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
