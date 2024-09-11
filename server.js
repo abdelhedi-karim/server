@@ -58,7 +58,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 
-// API endpoint to create a new user// API endpoint to create a new user// API endpoint to create a new user
+
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
     const { login, password, num } = req.body;
