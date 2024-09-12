@@ -58,6 +58,10 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 
+app.get('/', (req, res) => {
+    res.send('Hello, World! Your server is up and running.');
+  });
+
 
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
