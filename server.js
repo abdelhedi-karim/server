@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 const pool = new Pool({
     user: 'bet_owner',
     host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
-    database: 'bet',
+    database: 'depanini',
     password: '4IR9VtcSeCiw', // Make sure this is a string
     port: 5432,
     ssl: {
