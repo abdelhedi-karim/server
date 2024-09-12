@@ -77,42 +77,6 @@ app.post('/api/users', async (req, res) => {
         }
     }
 });
-// app.post('/api/admins', async (req, res) => {
-//     const { login, password } = req.body;
-//     try {
-//         const result = await pool.query(
-//             'INSERT INTO users (login, password, admin ) VALUES ($1, crypt($2, gen_salt(\'bf\')), TRUE) RETURNING *',
-//             [login, password ]
-//         );
-//         res.status(201).json(result.rows[0]);
-//     } catch (error) {
-//         if (error.code === '23505') {
-//             res.status(409).json({ error: 'Duplicate key value violates unique constraint.' });
-//         } else {
-//             console.error(error);
-//             res.status(500).json({ error: 'Internal Server Error' });
-//         }
-//     }
-// });
-
-// app.post('/api/shops', async (req, res) => {
-//     const { login, password, admin_name } = req.body;
-//     try {
-//         const result = await pool.query(
-//             'INSERT INTO users (login, password, shop, admin_name) VALUES ($1, crypt($2, gen_salt(\'bf\')), TRUE, $3) RETURNING *',
-//             [login, password, admin_name]
-//         );
-//         res.status(201).json(result.rows[0]);
-//     } catch (error) {
-//         if (error.code === '23505') {
-//             res.status(409).json({ error: 'Duplicate key value violates unique constraint.' });
-//         } else {
-//             console.error(error);
-//             res.status(500).json({ error: 'Internal Server Error' });
-//         }
-//     }
-// });
-
 
 
 
