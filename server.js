@@ -100,44 +100,8 @@ app.post('/api/authenticate', async (req, res) => {
 });
 
 
-// app.put('/api/users/:userId/add-money', async (req, res) => {
-//     const userId = req.params.userId;
-//     const { amount } = req.body;
-//     try {
-//         const result = await pool.query(
-//             'UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING *',
-//             [amount, userId]
-//         );
-//         if (result.rows.length > 0) {
-//             res.status(200).json({ message: 'Money added successfully', user: result.rows[0] });
-//         } else {
-//             res.status(404).json({ error: 'User not found' });
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
 
-// // API endpoint to take money from user's balance
-// app.put('/api/users/:userId/take-money', async (req, res) => {
-//     const userId = req.params.userId;
-//     const { amount } = req.body;
-//     try {
-//         const result = await pool.query(
-//             'UPDATE users SET balance = balance - $1 WHERE id = $2 AND balance >= $1 RETURNING *',
-//             [amount, userId]
-//         );
-//         if (result.rows.length > 0) {
-//             res.status(200).json({ message: 'Money taken successfully', user: result.rows[0] });
-//         } else {
-//             res.status(400).json({ error: 'Insufficient balance or user not found' });
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
+
 
 // API endpoint to get all users
 app.get('/api/users', async (req, res) => {
