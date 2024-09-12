@@ -18,10 +18,10 @@ app.use(bodyParser.json());
 // PostgreSQL connection setup
 
 const pool = new Pool({
-    user: 'depanini_user',
-    host: 'dpg-crhg3988fa8c73921130-a',
+    user: 'bet_owner',
+    host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
     database: 'depanini',
-    password: 'b2leNvmoqTMkUuTkBvpFCxwAAUIPcHlA', // Make sure this is a string
+    password: '4IR9VtcSeCiw', // Make sure this is a string
     port: 5432,
     ssl: {
         rejectUnauthorized: false, // Only for local testing with self-signed certificate
