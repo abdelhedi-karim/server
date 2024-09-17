@@ -13,7 +13,7 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors());
 
-// Middleware to parse JSON bodies
+
 app.use(bodyParser.json());
 // PostgreSQL connection setup
 
