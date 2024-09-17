@@ -17,6 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 // PostgreSQL connection setup
 
+
 // PostgreSQL connection setup
 const pool = new Pool({
     user: 'bet_owner',
@@ -35,7 +36,15 @@ pool.on('error', (err) => {
     process.exit(-1);
 });
 
-  
+  // Enable pgcrypto extension at application startup
+(async () => {
+    try {
+        await pool.query('CREATE EXTENSION IF NOT EXISTS pgcrypto;');
+        console.log('pgcrypto extension enabled.');
+    } catch (error) {
+        console.error('Error enabling pgcrypto extension:', error);
+    }
+})();
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
