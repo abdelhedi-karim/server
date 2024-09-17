@@ -71,27 +71,33 @@ const upload = multer({ storage });
 app.get('/', (req, res) => {
     res.send('Hello, World! Your server is up and running.');
   });
-
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
     const { login, password, num } = req.body;
-    
+
+    // Basic input validation
+    if (!login || !password || !num) {
+        return res.status(400).json({ error: 'Missing required fields: login, password, and num are required.' });
+    }
+
     try {
         const result = await pool.query(
             'INSERT INTO users (login, password, num) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3) RETURNING *',
             [login, password, num]
         );
-        
+
+        // Respond with the created user data
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        if (error.code === '23505') {
-            res.status(409).json({ error: 'Duplicate key value violates unique constraint.' });
+        if (error.code === '23505') { // Handle unique constraint violation
+            res.status(409).json({ error: 'A user with this login already exists.' });
         } else {
-            console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            console.error('Error creating user:', error);
+            res.status(500).json({ error: 'An error occurred while creating the user. Please try again.' });
         }
     }
 });
+
 
 
 
