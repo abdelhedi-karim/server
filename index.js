@@ -21,7 +21,7 @@ const pool = new Pool({
     user: 'bet_owner',
     host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
     database: 'depanini',
-    password: '4IR9VtcSeCiw', // Make sure this is a string
+    password: '4IR9VtcSeCiw', 
     port: 5432,
     ssl: {
         rejectUnauthorized: false, // Only for local testing with self-signed certificate
