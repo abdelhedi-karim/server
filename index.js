@@ -62,15 +62,16 @@ app.get('/', (req, res) => {
     res.send('Hello, World! Your server is up and running.');
   });
 
-
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
     const { login, password, num } = req.body;
+    
     try {
         const result = await pool.query(
-            'INSERT INTO users (login, password, num) VALUES ($1, crypt($2, gen_salt(\'bf\')),$3) RETURNING *',
+            'INSERT INTO users (login, password, num) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3) RETURNING *',
             [login, password, num]
         );
+        
         res.status(201).json(result.rows[0]);
     } catch (error) {
         if (error.code === '23505') {
