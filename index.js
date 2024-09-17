@@ -7,32 +7,25 @@ const path = require('path');
 const fs = require('fs');
 const streamifier = require('streamifier');
 
-
+// Create a new Express application
 const app = express();
 
 // Enable CORS for all routes
 app.use(cors());
 
-
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
 // PostgreSQL connection setup
 
 const pool = new Pool({
-    user: 'bet_owner',
-    host: 'ep-summer-bar-a5df4uvy.us-east-2.aws.neon.tech',
-    database: 'depanini',
-    password: '4IR9VtcSeCiw', 
-    port: 5432,
-    ssl: {
-        rejectUnauthorized: false, // Only for local testing with self-signed certificate
-    }
-});
-
-// Handle connection errors
-pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
-});
+    connectionString: process.env.POSTGRES_URL + "?sslmode=require",
+  })
+  
+  pool.connect((err) => {
+      if (err) throw err
+      console.log("Connect to PostgreSQL successfully!" )
+  })
+  
 
   
 const cloudinary = require('cloudinary').v2;
