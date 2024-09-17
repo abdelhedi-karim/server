@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const streamifier = require('streamifier');
 
-// Create a new Express application
+
 const app = express();
 
 // Enable CORS for all routes
