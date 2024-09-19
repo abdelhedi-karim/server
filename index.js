@@ -504,6 +504,53 @@ app.post('/api/resoffers', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/videos/'); // Directory for video uploads
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname}`); // Unique filename
+    }
+});
+
+// Set up Multer for video uploads
+const uploadVideo = multer({
+    storage: videoStorage,
+    limits: { fileSize: 100 * 1024 * 1024 }, // Limit video size (100MB in this example)
+    fileFilter(req, file, cb) {
+        // Validate video file types
+        if (!file.originalname.match(/\.(mp4|mkv|avi|mov)$/)) {
+            return cb(new Error('Please upload a video'));
+        }
+        cb(null, true);
+    }
+});
+app.post('/api/video', uploadVideo.single('video'), async (req, res) => {
+    const { username } = req.body;
+    const videoPath = req.file ? req.file.path : null;
+
+    console.log('Request Body:', { username, videoPath });
+
+    // Validate input
+    if (!username || !videoPath) {
+        return res.status(400).json({ error: 'Username and Video are required.' });
+    }
+
+    try {
+        // Insert query into the 'videos' table
+        const result = await pool.query(
+            `INSERT INTO public.videos (username, video) VALUES ($1, $2) RETURNING *`,
+            [username, JSON.stringify({ url: videoPath })]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
   
 // Start the server
 const PORT = process.env.PORT || 4000;
