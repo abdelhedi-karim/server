@@ -403,6 +403,7 @@ app.post('/api/produits', upload.single('img'), async (req, res) => {
 
  
 
+// Get all products
 app.get('/api/produits', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM produits');
@@ -411,7 +412,73 @@ app.get('/api/produits', async (req, res) => {
         console.error('Error fetching products:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-}); 
+});
+
+// Get one product by name and price
+app.get('/api/produits/:name/:prix', async (req, res) => {
+    const { name, prix } = req.params;
+    
+    try {
+        const result = await pool.query(
+            'SELECT * FROM produits WHERE name = $1 AND prix = $2',
+            [name, prix]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Update a product by name and price (PUT)
+app.put('/api/produits/:name/:prix', upload.single('img'), async (req, res) => {
+    const { name, prix } = req.params;
+    const { newName, newPrix, newDescription } = req.body;
+    const img = req.file ? req.file.path : null;
+
+    try {
+        const result = await pool.query(
+            'UPDATE produits SET name = $1, prix = $2, description = $3, img = $4 WHERE name = $5 AND prix = $6 RETURNING *',
+            [newName || name, newPrix || prix, newDescription || '', JSON.stringify({ url: img }) || null, name, prix]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Delete a product by name and price (DELETE)
+app.delete('/api/produits/:name/:prix', async (req, res) => {
+    const { name, prix } = req.params;
+
+    try {
+        const result = await pool.query(
+            'DELETE FROM produits WHERE name = $1 AND prix = $2 RETURNING *',
+            [name, prix]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json({ message: 'Product deleted successfully', deletedProduct: result.rows[0] });
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 // Add a new carte
 app.post('/carte', async (req, res) => {
