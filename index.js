@@ -620,7 +620,89 @@ app.post('/api/resoffers', async (req, res) => {
     }
   });
 
-
+// 1. Create a new message
+app.post('/api/messages', async (req, res) => {
+    const { user1, user2, text } = req.body;
+  
+    try {
+      const result = await pool.query(
+        `INSERT INTO msg (user1, user2, creatat, text, idmsg) 
+         VALUES ($1, $2, NOW(), $3, nextval('msg_idmsg_seq')) 
+         RETURNING *`,
+        [user1, user2, text]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error posting message:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // 2. Get all messages
+  app.get('/api/messages', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM msg');
+      res.status(200).json(result.rows);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // 3. Get a single message by idmsg
+  app.get('/api/messages/:idmsg', async (req, res) => {
+    const { idmsg } = req.params;
+  
+    try {
+      const result = await pool.query('SELECT * FROM msg WHERE idmsg = $1', [idmsg]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+      res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error fetching message:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // 4. Update the text of a message by idmsg
+  app.put('/api/messages/:idmsg', async (req, res) => {
+    const { idmsg } = req.params;
+    const { text } = req.body;
+  
+    try {
+      const result = await pool.query(
+        `UPDATE msg 
+         SET text = $1 
+         WHERE idmsg = $2 
+         RETURNING *`,
+        [text, idmsg]
+      );
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+      res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error updating message:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // 5. Delete a message by idmsg
+  app.delete('/api/messages/:idmsg', async (req, res) => {
+    const { idmsg } = req.params;
+  
+    try {
+      const result = await pool.query('DELETE FROM msg WHERE idmsg = $1 RETURNING *', [idmsg]);
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+      res.status(200).json({ message: 'Message deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
   
 // Start the server
 const PORT = process.env.PORT || 4000;
