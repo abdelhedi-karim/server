@@ -239,6 +239,36 @@ app.put('/api/user', upload.single('img'), async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+app.put('/api/user/admin', async (req, res) => { 
+    const { login } = req.body;
+
+    // Validate input
+    if (!login) {
+        return res.status(400).json({ error: 'Login is required.' });
+    }
+
+    try {
+        // Update query to change admin from false to true
+        const result = await pool.query(
+            `UPDATE users 
+            SET admin = true 
+            WHERE login = $1 AND admin = false
+            RETURNING *`,
+            [login]
+        );
+
+        // Check if the user exists and if admin was actually updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found or already an admin.' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 app.post('/api/story', upload.single('img'), async (req, res) => {
     const { username } = req.body;
     const img = req.file ? req.file.path : null;
