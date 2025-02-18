@@ -706,7 +706,88 @@ app.put('/api/messages/:user1/:user2', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-  
+  // 📌 CREATE - Add a new product
+app.post('/products', upload.single('img'), async (req, res) => {
+    const { prix, description, gender, taille, color } = req.body;
+    const imgUrl = req.file ? req.file.path : null;
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO public.akproduit (prix, description, gender, taille, color, img)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [prix, description, gender, taille, color, imgUrl]
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// 📌 READ - Get all products
+app.get('/products', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM public.akproduit');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// 📌 READ - Get a single product by ID
+app.get('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM public.akproduit WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// 📌 UPDATE - Update a product
+app.put('/products/:id', upload.single('img'), async (req, res) => {
+    const { id } = req.params;
+    const { prix, description, gender, taille, color } = req.body;
+    const imgUrl = req.file ? req.file.path : null;
+
+    try {
+        const result = await pool.query(
+            `UPDATE public.akproduit 
+             SET prix = $1, description = $2, gender = $3, taille = $4, color = $5, img = $6
+             WHERE id = $7 RETURNING *`,
+            [prix, description, gender, taille, color, imgUrl, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// 📌 DELETE - Delete a product
+app.delete('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM public.akproduit WHERE id = $1 RETURNING *', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 // Start the server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
