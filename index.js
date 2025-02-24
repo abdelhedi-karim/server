@@ -409,18 +409,18 @@ app.post('/api/produits', upload.single('img'), async (req, res) => {
     const img = req.file ? req.file.path : null;
 
     // Log request details for debugging
-    console.log('Request Body:', { name, prix, description, img });
+    console.log('Request Body:', { name, prix, description, img , username });
 
     // Validate input
-    if (!name || !prix || !description || !img) {
+    if (!name || !prix || !description || !img || !username) {
         return res.status(400).json({ error: 'All fields are required including the image.' });
     }
 
     try {
         // Insert query into the 'produits' table
         const result = await pool.query(
-            `INSERT INTO produits (name, prix, description, img) 
-             VALUES ($1, $2, $3, $4) RETURNING *`,
+            `INSERT INTO produits (name, prix, description, img, username) 
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [name, prix, description, JSON.stringify({ url: img })]
         );
 
