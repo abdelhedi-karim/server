@@ -74,23 +74,25 @@ app.get('/', (req, res) => {
 
 
 
-  app.post('/biens', upload.array('images', 10), async (req, res) => {
+  app.post('/biens', upload.array('images'), async (req, res) => {
     try {
-        const { type_bien, localisation, prix, description, mode } = req.body;
-        const images = req.files.map(file => file.path); // Get image URLs
+        const { type_bien, localisation, prix, description, mode, user_id } = req.body;
+        const imageUrls = req.files.map(file => file.path);
 
         const result = await pool.query(
-            `INSERT INTO biens (type_bien, localisation, prix, description, images, mode)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [type_bien, localisation, prix, description, JSON.stringify(images), mode]
+            `INSERT INTO biens (type_bien, localisation, prix, description, mode, user_id, images)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING *`,
+            [type_bien, localisation, prix, description, mode, user_id, JSON.stringify(imageUrls)]
         );
 
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to create bien' });
+        res.status(201).json({ success: true, bien: result.rows[0] });
+    } catch (error) {
+        console.error('Error inserting bien:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 app.get('/biens', async (req, res) => {
     try {
