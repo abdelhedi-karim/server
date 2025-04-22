@@ -71,6 +71,104 @@ const upload = multer({ storage });
 app.get('/', (req, res) => {
     res.send('Hello, World! Your server is up and running.');
   });
+
+
+
+  app.post('/biens', upload.array('images', 10), async (req, res) => {
+    try {
+        const { type_bien, localisation, prix, description, mode } = req.body;
+        const images = req.files.map(file => file.path); // Get image URLs
+
+        const result = await pool.query(
+            `INSERT INTO biens (type_bien, localisation, prix, description, images, mode)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [type_bien, localisation, prix, description, JSON.stringify(images), mode]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to create bien' });
+    }
+});
+
+app.get('/biens', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM biens');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch biens' });
+    }
+});
+
+app.get('/biens/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('SELECT * FROM biens WHERE id = $1', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Bien not found' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch bien' });
+    }
+});
+
+app.put('/biens/:id', upload.array('images', 10), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { type_bien, localisation, prix, description, mode } = req.body;
+        const images = req.files.map(file => file.path);
+
+        const result = await pool.query(
+            `UPDATE biens
+             SET type_bien = $1,
+                 localisation = $2,
+                 prix = $3,
+                 description = $4,
+                 images = $5,
+                 mode = $6
+             WHERE id = $7
+             RETURNING *`,
+            [type_bien, localisation, prix, description, JSON.stringify(images), mode, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Bien not found' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update bien' });
+    }
+});
+
+
+app.delete('/biens/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('DELETE FROM biens WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Bien not found' });
+        }
+
+        res.json({ message: 'Bien deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete bien' });
+    }
+});
+
+
+
+
+
 // API endpoint to create a new user
 app.post('/api/users', async (req, res) => {
     const { login, password, num } = req.body;
