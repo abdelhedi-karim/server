@@ -10,7 +10,7 @@ const streamifier = require('streamifier');
 // Create a new Express application
 const app = express();
 app.use(cors({
-    origin: 'http://depanini.onrender.com',
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
