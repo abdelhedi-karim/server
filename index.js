@@ -9,9 +9,11 @@ const streamifier = require('streamifier');
 
 // Create a new Express application
 const app = express();
-
-// Enable CORS for all routes
-app.use(cors());
+app.use(cors({
+    origin: 'http://depanini.onrender.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
