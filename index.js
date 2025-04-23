@@ -73,25 +73,25 @@ app.get('/', (req, res) => {
   });
 
 
-
   app.post('/biens', upload.array('images'), async (req, res) => {
     try {
-        const { type_bien, localisation, prix, description, mode, user_id } = req.body;
-        const imageUrls = req.files.map(file => file.path);
-
-        const result = await pool.query(
-            `INSERT INTO biens (type_bien, localisation, prix, description, mode, user_id, images)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING *`,
-            [type_bien, localisation, prix, description, mode, user_id, JSON.stringify(imageUrls)]
-        );
-
-        res.status(201).json({ success: true, bien: result.rows[0] });
+      const { type_bien, localisation, prix, description, mode, user_id } = req.body;
+      const imageUrls = req.files.map(file => file.path); // This is already a JS array of strings
+  
+      const result = await pool.query(
+        `INSERT INTO biens (type_bien, localisation, prix, description, mode, user_id, images)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING *`,
+        [type_bien, localisation, prix, description, mode, user_id, imageUrls] // pass array directly
+      );
+  
+      res.status(201).json({ success: true, bien: result.rows[0] });
     } catch (error) {
-        console.error('Error inserting bien:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+      console.error('Error inserting bien:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-});
+  });
+  
 
 
 app.get('/biens', async (req, res) => {
