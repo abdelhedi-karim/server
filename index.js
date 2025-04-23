@@ -74,32 +74,22 @@ app.get('/', (req, res) => {
 
   app.post('/biens', upload.array('images'), async (req, res) => {
     try {
-        const { type_bien, localisation, prix, mode, user_id } = req.body;
-        
-        // Get descriptions from the request (they come as descriptions[0], descriptions[1], etc.)
-        const descriptions = [];
-        for (const key in req.body) {
-            if (key.startsWith('descriptions[')) {
-                descriptions.push(req.body[key]);
-            }
-        }
-        
-        const imageUrls = req.files.map(file => file.path);
-
-        const result = await pool.query(
-            `INSERT INTO biens (type_bien, localisation, prix, descriptions, mode, user_id, images)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING *`,
-            [type_bien, localisation, prix, descriptions, mode, user_id, imageUrls]
-        );
-
-        res.status(201).json({ success: true, bien: result.rows[0] });
-    } catch (error) {
-        console.error('Error inserting bien:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
-});
+      const { type_bien, localisation, prix, description, mode, user_id } = req.body;
+      const imageUrls = req.files.map(file => file.path); // This is already a JS array of strings
   
+      const result = await pool.query(
+        `INSERT INTO biens (type_bien, localisation, prix, description, mode, user_id, images)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING *`,
+        [type_bien, localisation, prix, description, mode, user_id, imageUrls] // pass array directly
+      );
+  
+      res.status(201).json({ success: true, bien: result.rows[0] });
+    } catch (error) {
+      console.error('Error inserting bien:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+  });
 
 
 app.get('/biens', async (req, res) => {
