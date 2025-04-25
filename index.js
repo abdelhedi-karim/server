@@ -72,6 +72,127 @@ app.get('/', (req, res) => {
     res.send('Hello, World! Your server is up and running.');
   });
 
+
+  app.post('/api/demandes', async (req, res) => {
+    const { nomPrenom, telephone, typeLocation, region, typeBien, budget, details } = req.body;
+  
+    try {
+      const result = await pool.query(
+        `INSERT INTO demandes (
+          nom_prenom, telephone, type_location, 
+          region, type_bien, budget, details
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, nom_prenom, date_creation`,
+        [nomPrenom, telephone, typeLocation, region, typeBien, budget, details]
+      );
+  
+      res.status(201).json({
+        success: true,
+        demande: result.rows[0],
+        message: 'Demande enregistrée avec succès'
+      });
+  
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur'
+      });
+    }
+  });
+  
+  // READ - Get all demands
+  app.get('/api/demandes', async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT id, nom_prenom, telephone, type_location, 
+               region, type_bien, budget, 
+               TO_CHAR(date_creation, 'DD/MM/YYYY HH24:MI') as date_creation
+        FROM demandes
+        ORDER BY date_creation DESC
+      `);
+      
+      res.json({
+        success: true,
+        demandes: result.rows
+      });
+  
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur'
+      });
+    }
+  });
+  
+  // READ - Get single demand by ID
+  app.get('/api/demandes/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const result = await pool.query(
+        `SELECT * FROM demandes WHERE id = $1`,
+        [id]
+      );
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Demande non trouvée'
+        });
+      }
+  
+      res.json({
+        success: true,
+        demande: result.rows[0]
+      });
+  
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur'
+      });
+    }
+  });
+  
+  // UPDATE - Update demand status
+  app.put('/api/demandes/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+  
+    try {
+      const result = await pool.query(
+        `UPDATE demandes SET status = $1 WHERE id = $2
+         RETURNING id, status`,
+        [status, id]
+      );
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Demande non trouvée'
+        });
+      }
+  
+      res.json({
+        success: true,
+        updated: result.rows[0]
+      });
+  
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur'
+      });
+    }
+  });
+  
+
+
   app.post('/biens', upload.array('images'), async (req, res) => {
     try {
       const { type_bien, localisation, prix, description, mode, user_id } = req.body;
